@@ -696,7 +696,21 @@ async function clearAll() {
   _cache = [];
 }
 
-// ── RECEIPT NUMBER (atomic counter in Firestore) ──
+// ── RECEIPT NUMBER ──
+// peekNo: read-only preview shown on login/clear – does NOT increment the counter
+async function peekNo() {
+  const ref = doc(db, 'meta', 'counter');
+  try {
+    const snap = await getDoc(ref);
+    const n = snap.exists() ? (snap.data().n || 0) + 1 : 1;
+    const y = new Date().getFullYear().toString().slice(2);
+    return `ELD-${y}-${String(n).padStart(4,'0')}`;
+  } catch(e) {
+    return 'ELD-??-????';
+  }
+}
+
+// nextNo: atomically increments and returns the real number – called ONLY when saving
 async function nextNo() {
   const ref = doc(db, 'meta', 'counter');
   let n = 1;
@@ -827,9 +841,9 @@ async function initApp() {
   document.getElementById('rec-date').value=new Date().toISOString().split('T')[0];
   toast('Connecting to cloud…','info');
   try {
-    const no = await nextNo();
-    document.getElementById('rec-no').value = no;
     await loadRecs();
+    const no = await peekNo();
+    document.getElementById('rec-no').value = no;
     toast('Connected ✓','ok');
   } catch(e) {
     toast('Firebase error: '+e.message,'err');
@@ -866,13 +880,18 @@ async function generateReceipt(){
   };
   fill('pc-');fill('pr-');
 
-  // save to Firestore
+  // save to Firestore – nextNo increments counter here (only on actual save)
   try {
     toast('Saving to cloud…','info');
-    await saveRec({recNo,date,name,purpose,mode,amount:parseFloat(amount),words,createdAt:new Date().toISOString()});
+    const confirmedNo = await nextNo();        // ← real number assigned now
+    // update displayed receipt no and both copies with the confirmed number
+    document.getElementById('rec-no').value = confirmedNo;
+    document.getElementById('pc-no').textContent = confirmedNo;
+    document.getElementById('pr-no').textContent = confirmedNo;
+    await saveRec({recNo:confirmedNo,date,name,purpose,mode,amount:parseFloat(amount),words,createdAt:new Date().toISOString()});
     toast('Receipt saved ✓','ok');
-    // refresh receipt number for next entry
-    const nxt = await nextNo();
+    // show NEXT pending number (peek only – no increment)
+    const nxt = await peekNo();
     document.getElementById('rec-no').value = nxt;
   } catch(e) {
     toast('Save failed: '+e.message,'err');
@@ -896,7 +915,7 @@ function clearForm(){
   document.getElementById('rec-mode').selectedIndex=0;
   document.getElementById('words-display').textContent='—';
   hidePreview();
-  nextNo().then(n=>document.getElementById('rec-no').value=n);
+  peekNo().then(n=>document.getElementById('rec-no').value=n);
 }
 window.clearForm = clearForm;
 
