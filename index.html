@@ -1412,9 +1412,18 @@ function dashFormatAI(text){
 
 async function dashCallClaude(sys, usr){
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'anthropic-beta':'claude-ai-proxy-2025-02-19',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:usr}]})
   });
+  if(!resp.ok){
+    const err=await resp.text();
+    throw new Error('API '+resp.status+': '+err.slice(0,120));
+  }
   const data=await resp.json();
   return data.content?.[0]?.text||'No response.';
 }
@@ -1428,7 +1437,7 @@ async function dashGenerateInsight(recs){
   try{
     const text=await dashCallClaude(sys,summary);
     el.innerHTML=dashFormatAI(text);
-  }catch(e){el.innerHTML='<p style="color:#f9a8a8">Could not generate AI insight. Check your connection.</p>';}
+  }catch(e){el.innerHTML='<p style="color:#f9a8a8">⚠ AI error: '+e.message+'</p>';}
 }
 
 async function dashAskAI(){
