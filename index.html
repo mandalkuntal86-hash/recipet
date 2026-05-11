@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eldorado – Money Receipt</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   :root {
     --gold:#b8860b;--gold-light:#d4a017;--gold-pale:#f5e9c8;
@@ -260,6 +261,79 @@
     .user-name{display:none;}
     .user-badge{padding:0 8px;gap:6px;}
   }
+
+  /* ── DASHBOARD TAB ── */
+  #tab-dashboard{padding:22px 18px;max-width:1000px;margin:0 auto;}
+  .dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+  .dash-stat{background:var(--white);border:1px solid #d9d2c5;border-radius:10px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.05);position:relative;overflow:hidden;}
+  .dash-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .dash-stat.gold::before{background:var(--gold);}
+  .dash-stat.green::before{background:var(--green);}
+  .dash-stat.blue::before{background:#1a5fa5;}
+  .dash-stat.purple::before{background:#6a3fa5;}
+  .dash-stat.red::before{background:var(--red);}
+  .dash-stat-lbl{font-size:.68rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;}
+  .dash-stat-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--ink);line-height:1;}
+  .dash-stat-sub{font-size:.7rem;color:var(--ink-light);margin-top:4px;}
+  .dash-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  @media(max-width:600px){.dash-charts{grid-template-columns:1fr;}}
+  .dash-chart-card{background:var(--white);border:1px solid #d9d2c5;border-radius:10px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .dash-chart-card h3{font-size:.75rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px;}
+  .dash-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  @media(max-width:600px){.dash-two{grid-template-columns:1fr;}}
+  .dash-panel{background:var(--white);border:1px solid #d9d2c5;border-radius:10px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .dash-panel h3{font-size:.75rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px;}
+  .ai-insight-box{background:linear-gradient(135deg,#0f0e17 0%,#2d1a5c 100%);border-radius:10px;padding:22px 24px;margin-bottom:24px;position:relative;overflow:hidden;}
+  .ai-insight-box::before{content:'✦';position:absolute;right:20px;top:16px;font-size:2.5rem;opacity:.08;color:#fff;}
+  .ai-badge-top{display:inline-flex;align-items:center;gap:6px;background:rgba(184,134,11,.2);border:1px solid rgba(184,134,11,.4);color:var(--gold);font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px;}
+  .ai-title{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;margin-bottom:10px;}
+  .ai-text{font-size:.85rem;line-height:1.8;color:rgba(255,255,255,.75);}
+  .ai-text strong{color:#fff;}
+  .ai-chip-gold{background:rgba(184,134,11,.25);color:var(--gold);padding:1px 7px;border-radius:12px;font-size:.8rem;font-weight:600;}
+  .ai-loading-msg{color:rgba(255,255,255,.5);font-size:.83rem;display:flex;align-items:center;gap:10px;}
+  .ai-dots span{display:inline-block;width:5px;height:5px;background:var(--gold);border-radius:50%;animation:aidot .8s infinite;margin:0 2px;}
+  .ai-dots span:nth-child(2){animation-delay:.15s;}
+  .ai-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes aidot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+  .ask-row{display:flex;gap:10px;margin-bottom:20px;}
+  .ask-row input{flex:1;padding:9px 14px;border:1.5px solid #d9d2c5;border-radius:8px;font-family:'Source Sans 3',sans-serif;font-size:.88rem;color:var(--ink);background:var(--bg);outline:none;transition:border-color .2s;}
+  .ask-row input:focus{border-color:var(--gold);}
+  .ask-row button{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-family:'Source Sans 3',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;letter-spacing:.03em;}
+  .ask-row button:hover{background:#2d2c3e;}
+  .ask-row button:disabled{opacity:.5;cursor:default;}
+  .ask-answer-box{background:var(--white);border:1px solid #d9d2c5;border-radius:10px;padding:18px 20px;margin-bottom:20px;display:none;}
+  .ask-answer-box h4{font-size:.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+  .ask-answer-text{font-size:.86rem;line-height:1.8;color:var(--ink-mid);}
+  .recip-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0ede6;}
+  .recip-row:last-child{border-bottom:none;}
+  .recip-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold-pale);border:1.5px solid #d4a017;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold);flex-shrink:0;font-family:'Playfair Display',serif;}
+  .recip-name{font-weight:600;font-size:.83rem;color:var(--ink);}
+  .recip-meta{font-size:.7rem;color:var(--ink-light);}
+  .recip-amt{margin-left:auto;font-weight:700;font-size:.83rem;color:var(--green);}
+  .bar-t{height:3px;background:#e8e3da;border-radius:2px;margin-top:3px;}
+  .bar-f{height:3px;background:var(--gold);border-radius:2px;transition:width 1s ease;}
+  .purp-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .purp-lbl{font-size:.78rem;color:var(--ink-mid);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
+  .purp-bar-t{flex:2;height:5px;background:#e8e3da;border-radius:3px;}
+  .purp-bar-f{height:5px;border-radius:3px;transition:width 1.2s ease;}
+  .purp-pct{font-size:.7rem;font-weight:700;color:var(--ink-light);min-width:32px;text-align:right;}
+  .dash-section-hdr{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--ink-mid);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .dash-section-hdr::after{content:'';flex:1;height:1px;background:var(--gold-pale);}
+  .mode-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;font-size:.72rem;color:var(--ink-light);}
+  .mode-swatch{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:3px;}
+  .dash-recent-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+  .dash-recent-table thead th{padding:8px 10px;text-align:left;font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-light);background:var(--bg);border-bottom:1px solid #e8e3da;}
+  .dash-recent-table tbody tr:hover{background:var(--gold-pale);}
+  .dash-recent-table tbody td{padding:8px 10px;border-bottom:1px solid #f0ede6;color:var(--ink-mid);}
+  .dash-recent-table tbody tr:last-child td{border-bottom:none;}
+  .dash-rec-no{font-family:'Playfair Display',serif;font-weight:700;color:var(--gold);font-size:.78rem;}
+  .dash-amt{font-weight:700;color:var(--green);}
+  .dash-mode-pill{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:12px;background:#e8f0fb;color:#1a5fa5;}
+  .dash-mode-pill.cash{background:var(--green-bg,#eaf4ee);color:var(--green);}
+  .dash-mode-pill.upi{background:#f3eefb;color:#6a3fa5;}
+  .refresh-dash-btn{background:transparent;border:1.5px solid #d9d2c5;border-radius:7px;padding:6px 14px;font-family:'Source Sans 3',sans-serif;font-size:.75rem;font-weight:700;color:var(--ink-light);cursor:pointer;transition:all .15s;float:right;margin-top:-2px;}
+  .refresh-dash-btn:hover{border-color:var(--gold);color:var(--gold);}
+
 </style>
 </head>
 <body>
@@ -287,6 +361,7 @@
   <button class="tab-btn active" onclick="switchTab('form')">📄 New Receipt</button>
   <button class="tab-btn" onclick="switchTab('records')">🗂 Records</button>
   <button class="tab-btn" id="tab-emp-btn" onclick="switchTab('employees')" style="display:none">👥 Employees</button>
+  <button class="tab-btn" id="tab-dash-btn" onclick="switchTab('dashboard')">📊 Dashboard</button>
   <div class="user-badge">
     <span class="user-name" id="user-display"></span>
     <span class="user-role-pill" id="role-pill"></span>
@@ -493,6 +568,83 @@
   </div>
 </div>
 
+
+<!-- ── DASHBOARD TAB ── -->
+<div class="tab-content" id="tab-dashboard">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+    <div class="dash-section-hdr" style="margin-bottom:0;flex:1;">Overview</div>
+    <button class="refresh-dash-btn" onclick="initDashboard()">↻ Refresh</button>
+  </div>
+
+  <!-- KPI STATS -->
+  <div class="dash-stats" id="dash-stats">
+    <div class="dash-stat gold"><div class="dash-stat-lbl">Total Receipts</div><div class="dash-stat-val" id="d-count">—</div><div class="dash-stat-sub" id="d-count-sub"></div></div>
+    <div class="dash-stat green"><div class="dash-stat-lbl">Total Revenue</div><div class="dash-stat-val" id="d-total">—</div><div class="dash-stat-sub" id="d-total-sub"></div></div>
+    <div class="dash-stat blue"><div class="dash-stat-lbl">This Month</div><div class="dash-stat-val" id="d-month">—</div><div class="dash-stat-sub" id="d-month-sub"></div></div>
+    <div class="dash-stat purple"><div class="dash-stat-lbl">Avg per Receipt</div><div class="dash-stat-val" id="d-avg">—</div><div class="dash-stat-sub"></div></div>
+    <div class="dash-stat red"><div class="dash-stat-lbl">Recipients</div><div class="dash-stat-val" id="d-recip">—</div><div class="dash-stat-sub" id="d-recip-sub"></div></div>
+  </div>
+
+  <!-- AI INSIGHT -->
+  <div class="dash-section-hdr">AI Analysis</div>
+  <div class="ai-insight-box">
+    <div class="ai-badge-top">✦ Claude AI</div>
+    <div class="ai-title">Smart Business Insights</div>
+    <div class="ai-text" id="dash-ai-insight">
+      <div class="ai-loading-msg"><div class="ai-dots"><span></span><span></span><span></span></div> Analysing your receipt data…</div>
+    </div>
+  </div>
+
+  <!-- ASK AI -->
+  <div class="dash-section-hdr">Ask AI</div>
+  <div class="ask-row">
+    <input id="dash-ask-input" placeholder="e.g. Who paid the most? What is the trend for rent payments?" />
+    <button id="dash-ask-btn" onclick="dashAskAI()">Ask ✦</button>
+  </div>
+  <div class="ask-answer-box" id="dash-ask-box">
+    <h4 id="dash-ask-q-title">Your Question</h4>
+    <div class="ask-answer-text" id="dash-ask-answer"></div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="dash-section-hdr">Trends</div>
+  <div class="dash-charts">
+    <div class="dash-chart-card">
+      <h3>Monthly Revenue</h3>
+      <div style="position:relative;height:200px;"><canvas id="d-chart-monthly" role="img" aria-label="Monthly revenue chart">Monthly revenue.</canvas></div>
+    </div>
+    <div class="dash-chart-card">
+      <h3>Payment Mode Split</h3>
+      <div class="mode-legend" id="d-mode-legend"></div>
+      <div style="position:relative;height:170px;"><canvas id="d-chart-mode" role="img" aria-label="Payment mode donut chart">Payment modes.</canvas></div>
+    </div>
+  </div>
+
+  <!-- TOP RECIPIENTS + PURPOSES -->
+  <div class="dash-two">
+    <div class="dash-panel">
+      <h3>Top Recipients</h3>
+      <div id="d-top-recip"><div style="color:var(--ink-light);font-size:.82rem;font-style:italic;">Loading…</div></div>
+    </div>
+    <div class="dash-panel">
+      <h3>Purpose Breakdown</h3>
+      <div id="d-purpose"><div style="color:var(--ink-light);font-size:.82rem;font-style:italic;">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- RECENT TABLE -->
+  <div class="dash-section-hdr">Recent Receipts</div>
+  <div class="dash-chart-card" style="overflow:auto;">
+    <table class="dash-recent-table">
+      <thead><tr><th>Receipt No.</th><th>Date</th><th>Recipient</th><th>Purpose</th><th>Mode</th><th>Amount</th></tr></thead>
+      <tbody id="d-recent-tbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--ink-light);font-style:italic;">Loading…</td></tr></tbody>
+    </table>
+  </div>
+  <div style="height:24px;"></div>
+
+</div>
+
 <!-- ── EMPLOYEES TAB (ADMIN ONLY) ── -->
 <div class="tab-content" id="tab-employees">
   <div class="tab-content" style="display:block;padding:0;">
@@ -530,6 +682,30 @@
       <div style="color:var(--ink-light);font-style:italic;font-size:.88rem;">Loading…</div>
     </div>
   </div>
+
+  <!-- COUNTER REPAIR (ADMIN ONLY) -->
+  <div class="emp-card">
+    <h2>🔢 Receipt Number Counter</h2>
+    <p style="font-size:.85rem;color:var(--ink-light);margin-bottom:14px;">
+      Use this to fix the counter if it jumped ahead. Set it to the <strong>number of receipts actually saved</strong>
+      (e.g. if 0 receipts saved → set to <strong>0</strong>; if 3 receipts saved → set to <strong>3</strong>).
+      Next receipt will then be that number + 1.
+    </p>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:.7rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;">Current Counter</label>
+        <div id="counter-current" style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold);padding:8px 16px;background:var(--gold-pale);border:1.5px solid var(--border);border-radius:8px;min-width:80px;text-align:center;">…</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:.7rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;">Set Counter To</label>
+        <input type="number" id="counter-set-val" min="0" step="1" placeholder="e.g. 0" style="width:120px;padding:9px 12px;border:1.5px solid #d9d2c5;border-radius:7px;font-size:.95rem;font-family:'Source Sans 3',sans-serif;" />
+      </div>
+      <button class="btn btn-primary" style="align-self:flex-end;" onclick="resetCounter()">Fix Counter ▶</button>
+      <button class="btn btn-secondary" style="align-self:flex-end;font-size:.78rem;" onclick="refreshCounterDisplay()">↻ Refresh</button>
+    </div>
+    <div id="counter-hint" style="margin-top:10px;font-size:.82rem;color:var(--green);font-weight:600;"></div>
+  </div>
+
   </div>
 </div>
 <script type="module">
@@ -727,6 +903,51 @@ async function nextNo() {
   return `ELD-${y}-${String(n).padStart(4,'0')}`;
 }
 
+// ── COUNTER REPAIR (ADMIN) ──
+async function refreshCounterDisplay() {
+  const el = document.getElementById('counter-current');
+  const hint = document.getElementById('counter-hint');
+  if(!el) return;
+  el.textContent = '…';
+  if(hint) hint.textContent = '';
+  try {
+    const ref = doc(db, 'meta', 'counter');
+    const snap = await getDoc(ref);
+    const n = snap.exists() ? (snap.data().n || 0) : 0;
+    el.textContent = n;
+    const recs = getCached();
+    if(hint) hint.textContent = `ℹ️ ${recs.length} receipt(s) saved in database. Counter should ideally equal ${recs.length}.`;
+  } catch(e) {
+    el.textContent = 'Error';
+  }
+}
+window.refreshCounterDisplay = refreshCounterDisplay;
+
+async function resetCounter() {
+  if(!isAdmin()) { toast('Admin only', 'err'); return; }
+  const val = parseInt(document.getElementById('counter-set-val').value);
+  if(isNaN(val) || val < 0) { toast('Enter a valid number (0 or above)', 'err'); return; }
+  const recs = getCached();
+  if(!confirm(`Set counter to ${val}?
+
+You have ${recs.length} saved receipt(s).
+Next receipt will be ELD-${new Date().getFullYear().toString().slice(2)}-${String(val+1).padStart(4,'0')}.
+
+Proceed?`)) return;
+  try {
+    toast('Fixing counter…', 'info');
+    const ref = doc(db, 'meta', 'counter');
+    await setDoc(ref, { n: val });
+    toast(`Counter set to ${val} ✓`, 'ok');
+    document.getElementById('counter-set-val').value = '';
+    await refreshCounterDisplay();
+    // Update the receipt number field on the form
+    const nxt = await peekNo();
+    document.getElementById('rec-no').value = nxt;
+  } catch(e) { toast('Failed: ' + e.message, 'err'); }
+}
+window.resetCounter = resetCounter;
+
 // ── STATUS TOAST ──
 function toast(msg, type='info') {
   let t = document.getElementById('fb-toast');
@@ -746,7 +967,8 @@ function switchTab(t) {
   const btns = document.querySelectorAll('.tab-btn');
   if(t==='form') btns[0].classList.add('active');
   else if(t==='records') btns[1].classList.add('active');
-  else if(t==='employees') { document.getElementById('tab-emp-btn').classList.add('active'); renderEmployees(); }
+  else if(t==='employees') { document.getElementById('tab-emp-btn').classList.add('active'); renderEmployees(); refreshCounterDisplay(); }
+  else if(t==='dashboard') { document.getElementById('tab-dash-btn').classList.add('active'); initDashboard(); }
   if(t==='records') renderTable();
 }
 window.switchTab = switchTab;
@@ -1034,6 +1256,214 @@ function reprint(docId){
 window.reprint = reprint;
 
 // ── INIT ──
+
+// ── DASHBOARD ──
+const DINR = v => '₹' + parseFloat(v||0).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0});
+const DMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DMODE_COLORS = {Cash:'#1a7a4a',UPI:'#6a3fa5',Cheque:'#1a5fa5','Bank Transfer':'#b8860b','Demand Draft':'#c0392b'};
+let dMonthChart=null, dModeChart=null;
+
+function dashComputeStats(recs){
+  const now=new Date();
+  const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const total=recs.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const mRecs=recs.filter(r=>r.date&&r.date.startsWith(ym));
+  const mTotal=mRecs.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  return{total,mTotal,mCount:mRecs.length,avg:recs.length?total/recs.length:0,uniq:new Set(recs.map(r=>r.name)).size};
+}
+
+function dashRenderStats(recs){
+  const s=dashComputeStats(recs);
+  document.getElementById('d-count').textContent=recs.length;
+  document.getElementById('d-count-sub').textContent='total receipts issued';
+  document.getElementById('d-total').textContent=DINR(s.total);
+  document.getElementById('d-total-sub').textContent='cumulative revenue';
+  document.getElementById('d-month').textContent=DINR(s.mTotal);
+  document.getElementById('d-month-sub').textContent=s.mCount+' receipts this month';
+  document.getElementById('d-avg').textContent=DINR(s.avg);
+  document.getElementById('d-recip').textContent=s.uniq;
+  document.getElementById('d-recip-sub').textContent='unique recipients';
+}
+
+function dashRenderMonthly(recs){
+  const map={};
+  recs.forEach(r=>{if(!r.date)return;const k=r.date.slice(0,7);map[k]=(map[k]||0)+parseFloat(r.amount||0);});
+  const keys=Object.keys(map).sort().slice(-12);
+  const labels=keys.map(k=>{const[y,m]=k.split('-');return DMONTHS[parseInt(m)-1]+' '+y.slice(2);});
+  const data=keys.map(k=>Math.round(map[k]));
+  if(dMonthChart)dMonthChart.destroy();
+  dMonthChart=new Chart(document.getElementById('d-chart-monthly'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Revenue',data,backgroundColor:'#b8860b',borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'\u20b9'+ctx.raw.toLocaleString('en-IN')}}},
+      scales:{x:{ticks:{color:'#9190a0',font:{size:10}},grid:{display:false}},
+              y:{ticks:{color:'#9190a0',font:{size:10},callback:v=>'\u20b9'+v.toLocaleString('en-IN')},grid:{color:'rgba(0,0,0,.05)'}}}}
+  });
+}
+
+function dashRenderMode(recs){
+  const map={};
+  recs.forEach(r=>{const m=r.mode||'Other';map[m]=(map[m]||0)+1;});
+  const labels=Object.keys(map);
+  const data=labels.map(l=>map[l]);
+  const colors=labels.map(l=>DMODE_COLORS[l]||'#888');
+  document.getElementById('d-mode-legend').innerHTML=labels.map((l,i)=>`<span><span class="mode-swatch" style="background:${colors[i]}"></span>${l} (${map[l]})</span>`).join('');
+  if(dModeChart)dModeChart.destroy();
+  dModeChart=new Chart(document.getElementById('d-chart-mode'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff',hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.raw+' receipts'}}}}
+  });
+}
+
+function dashRenderTopRecip(recs){
+  const map={};
+  recs.forEach(r=>{const n=r.name||'?';if(!map[n])map[n]={t:0,c:0};map[n].t+=parseFloat(r.amount||0);map[n].c++;});
+  const sorted=Object.entries(map).sort((a,b)=>b[1].t-a[1].t).slice(0,6);
+  const maxAmt=sorted[0]?.[1].t||1;
+  const el=document.getElementById('d-top-recip');
+  if(!sorted.length){el.innerHTML='<div style="color:var(--ink-light);font-size:.82rem;font-style:italic;">No data yet</div>';return;}
+  el.innerHTML=sorted.map(([n,d])=>{
+    const pct=Math.round(d.t/maxAmt*100);
+    const ini=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="recip-row">
+      <div class="recip-avatar">${ini}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="recip-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n}</div>
+        <div class="recip-meta">${d.c} receipt${d.c>1?'s':''}</div>
+        <div class="bar-t"><div class="bar-f" style="width:${pct}%"></div></div>
+      </div>
+      <div class="recip-amt">${DINR(d.t)}</div>
+    </div>`;
+  }).join('');
+}
+
+function dashRenderPurpose(recs){
+  const map={};
+  recs.forEach(r=>{const raw=(r.purpose||'Other').trim();const k=raw.length>28?raw.slice(0,28)+'…':raw;map[k]=(map[k]||0)+parseFloat(r.amount||0);});
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxA=sorted[0]?.[1]||1;
+  const PCOLS=['#b8860b','#1a7a4a','#1a5fa5','#6a3fa5','#c0392b','#d4a017','#085041'];
+  const el=document.getElementById('d-purpose');
+  if(!sorted.length){el.innerHTML='<div style="color:var(--ink-light);font-size:.82rem;font-style:italic;">No data yet</div>';return;}
+  el.innerHTML=sorted.map(([lbl,amt],i)=>{
+    const pct=Math.round(amt/maxA*100);
+    return `<div class="purp-row">
+      <div class="purp-lbl" title="${lbl}">${lbl}</div>
+      <div class="purp-bar-t"><div class="purp-bar-f" style="width:${pct}%;background:${PCOLS[i%PCOLS.length]}"></div></div>
+      <div class="purp-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function dashRenderTable(recs){
+  const tbody=document.getElementById('d-recent-tbody');
+  const recent=recs.slice(0,20);
+  if(!recent.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--ink-light);font-style:italic;">No receipts yet.</td></tr>';return;}
+  tbody.innerHTML=recent.map(r=>{
+    const purp=(r.purpose||'—').length>26?(r.purpose.slice(0,26)+'…'):r.purpose||'—';
+    const mc=r.mode==='Cash'?'cash':r.mode==='UPI'?'upi':'';
+    return `<tr>
+      <td><span class="dash-rec-no">${r.recNo||'—'}</span></td>
+      <td>${fmtD(r.date)}</td>
+      <td>${r.name||'—'}</td>
+      <td title="${r.purpose||''}">${purp}</td>
+      <td><span class="dash-mode-pill ${mc}">${r.mode||'—'}</span></td>
+      <td class="dash-amt">${fmtA(r.amount||0)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function dashBuildSummary(recs){
+  const s=dashComputeStats(recs);
+  const modes={};
+  recs.forEach(r=>{const m=r.mode||'Other';modes[m]=(modes[m]||0)+1;});
+  const monthly={};
+  recs.forEach(r=>{if(!r.date)return;const k=r.date.slice(0,7);monthly[k]=(monthly[k]||0)+parseFloat(r.amount||0);});
+  const topM=Object.entries(monthly).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>k+':\u20b9'+Math.round(v)).join(', ');
+  const rmap={};
+  recs.forEach(r=>{const n=r.name||'?';if(!rmap[n])rmap[n]={t:0,c:0};rmap[n].t+=parseFloat(r.amount||0);rmap[n].c++;});
+  const topR=Object.entries(rmap).sort((a,b)=>b[1].t-a[1].t).slice(0,5).map(([n,d])=>`${n}(\u20b9${Math.round(d.t)},${d.c}txns)`).join(', ');
+  const pmap={};
+  recs.forEach(r=>{const p=(r.purpose||'?').slice(0,35);pmap[p]=(pmap[p]||0)+parseFloat(r.amount||0);});
+  const topP=Object.entries(pmap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([p,v])=>`${p}(\u20b9${Math.round(v)})`).join(', ');
+  return `ELDORADO BUSINESS DATA:\n- Total receipts: ${recs.length}\n- Total revenue: \u20b9${Math.round(s.total)}\n- This month: \u20b9${Math.round(s.mTotal)} (${s.mCount} receipts)\n- Average per receipt: \u20b9${Math.round(s.avg)}\n- Unique recipients: ${s.uniq}\n- Payment modes: ${Object.entries(modes).map(([k,v])=>k+'('+v+')').join(', ')}\n- Top months: ${topM||'N/A'}\n- Top recipients: ${topR||'N/A'}\n- Top purposes: ${topP||'N/A'}`;
+}
+
+function dashFormatAI(text){
+  return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\u20b9[\d,]+/g,m=>`<span class="ai-chip-gold">${m}</span>`)
+    .split('\n').filter(l=>l.trim()).map(l=>`<p style="margin-bottom:8px;">${l}</p>`).join('');
+}
+
+async function dashCallClaude(sys, usr){
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:usr}]})
+  });
+  const data=await resp.json();
+  return data.content?.[0]?.text||'No response.';
+}
+
+async function dashGenerateInsight(recs){
+  const el=document.getElementById('dash-ai-insight');
+  el.innerHTML='<div class="ai-loading-msg"><div class="ai-dots"><span></span><span></span><span></span></div> Analysing your receipts with Claude AI…</div>';
+  if(!recs.length){el.innerHTML='<p>No receipt data found. Generate some receipts to see AI insights.</p>';return;}
+  const summary=dashBuildSummary(recs);
+  const sys=`You are a sharp business analyst for Eldorado, a property/business in Bongaon, West Bengal. Analyse the receipt/payment data and give 4-5 concise, actionable insights. Focus on: revenue patterns, top payers, payment mode preferences, seasonal trends, and business health. Be specific with numbers. Write in flowing paragraphs, not bullet points. Keep it under 200 words. Use \u20b9 for amounts.`;
+  try{
+    const text=await dashCallClaude(sys,summary);
+    el.innerHTML=dashFormatAI(text);
+  }catch(e){el.innerHTML='<p style="color:#f9a8a8">Could not generate AI insight. Check your connection.</p>';}
+}
+
+async function dashAskAI(){
+  const inp=document.getElementById('dash-ask-input');
+  const q=inp.value.trim();
+  if(!q)return;
+  const btn=document.getElementById('dash-ask-btn');
+  const box=document.getElementById('dash-ask-box');
+  const ans=document.getElementById('dash-ask-answer');
+  const qtitle=document.getElementById('dash-ask-q-title');
+  btn.disabled=true;
+  box.style.display='block';
+  qtitle.textContent=q;
+  ans.innerHTML='<div class="ai-loading-msg" style="color:var(--ink-light);"><div class="ai-dots" style=""><span style="background:var(--gold)"></span><span style="background:var(--gold)"></span><span style="background:var(--gold)"></span></div> Thinking…</div>';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const summary=dashBuildSummary(getCached());
+  const sys=`You are a helpful AI assistant for Eldorado business in Bongaon, West Bengal. Answer questions about their receipt/payment data accurately. Be concise and specific. Use \u20b9 for amounts.`;
+  try{
+    const text=await dashCallClaude(sys,`DATA:\n${summary}\n\nQUESTION: ${q}`);
+    ans.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').split('\n').filter(l=>l.trim()).map(l=>`<p style="margin-bottom:6px;">${l}</p>`).join('');
+  }catch(e){ans.innerHTML='<p style="color:var(--red)">Could not get answer. Please try again.</p>';}
+  btn.disabled=false;
+  inp.value='';
+}
+window.dashAskAI=dashAskAI;
+
+document.getElementById('dash-ask-input').addEventListener('keydown',e=>{if(e.key==='Enter')dashAskAI();});
+
+let dashInitialized=false;
+async function initDashboard(){
+  try{
+    if(!dashInitialized){
+      toast('Loading dashboard…','info');
+      await loadRecs();
+      dashInitialized=true;
+    }
+    const recs=getCached();
+    dashRenderStats(recs);
+    dashRenderMonthly(recs);
+    dashRenderMode(recs);
+    dashRenderTopRecip(recs);
+    dashRenderPurpose(recs);
+    dashRenderTable(recs);
+    dashGenerateInsight(recs);
+  }catch(e){toast('Dashboard error: '+e.message,'err');}
+}
+window.initDashboard=initDashboard;
 
 </script>
 </body>
