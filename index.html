@@ -103,6 +103,63 @@
   .filtered-stat .stat-val{color:var(--green);}
   #search-input{width:160px;}
 
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 600px) {
+    /* TAB BAR */
+    .brand{font-size:.9rem;padding:12px 14px;letter-spacing:.08em;}
+    .tab-btn{padding:12px 14px;font-size:.75rem;}
+
+    /* LAYOUT */
+    .tab-content{padding:14px 12px;}
+    .form-card{padding:18px 16px;}
+
+    /* FORM GRID → single column */
+    .form-grid{grid-template-columns:1fr;gap:12px;}
+    .form-group.full{grid-column:1;}
+
+    /* RECORDS HEADER */
+    .records-header{flex-direction:column;align-items:flex-start;}
+    .records-header h2{font-size:1.05rem;}
+    .btn-danger{width:100%;text-align:center;}
+
+    /* FILTER BAR → full width single column */
+    .filter-bar{flex-direction:column;gap:10px;padding:14px;}
+    .filter-group{min-width:100%;width:100%;}
+    .filter-bar input[type="text"],
+    .filter-bar input[type="date"],
+    .filter-bar select{width:100%;font-size:.9rem;padding:9px 12px;}
+    #search-input{width:100%;}
+    .btn-reset-filter{width:100%;text-align:center;padding:9px;font-size:.82rem;}
+
+    /* STATS ROW → 3 cols on mobile, wrap extra */
+    .stats-row{flex-wrap:wrap;gap:8px;}
+    .stat-card{min-width:calc(33% - 6px);padding:10px 6px;}
+    .stat-val{font-size:1.1rem;}
+    .stat-lbl{font-size:.62rem;}
+
+    /* TABLE → card layout on mobile */
+    .table-wrap{border-radius:8px;overflow-x:auto;}
+    table{font-size:.78rem;}
+    thead th{padding:8px 8px;font-size:.65rem;}
+    tbody td{padding:8px 8px;}
+
+    /* BUTTON ROW */
+    .btn-row{flex-wrap:wrap;justify-content:stretch;}
+    .btn-row .btn{flex:1;text-align:center;padding:10px 12px;font-size:.82rem;}
+
+    /* SIG GRID */
+    .sig-grid{grid-template-columns:1fr;}
+  }
+
+  @media (max-width: 400px) {
+    /* very small phones */
+    .brand{font-size:.8rem;padding:10px 10px;}
+    .tab-btn{padding:10px 10px;font-size:.7rem;}
+    .stats-row{gap:6px;}
+    .stat-card{min-width:calc(50% - 4px);}
+    table{font-size:.72rem;}
+  }
+
   /* PREVIEW */
   #preview-section{display:none;margin-top:20px;}
   #preview-section.visible{display:block;}
@@ -166,14 +223,75 @@
   .sign-cap{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-light);font-weight:700;}
   .rec-footer{text-align:center;margin-top:5px;font-size:9px;color:var(--ink-light);border-top:1px dashed #c5bfb0;padding-top:4px;letter-spacing:.03em;}
   .scissors-line{text-align:center;font-size:10px;color:#c5bfb0;letter-spacing:.2em;padding:3px 0;border-top:1px dashed #c5bfb0;border-bottom:1px dashed #c5bfb0;user-select:none;}
+
+  /* LOGIN SCREEN */
+  #login-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+  .login-box{background:var(--white);border-radius:16px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .login-logo{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--gold);letter-spacing:.18em;text-align:center;margin-bottom:4px;}
+  .login-sub{text-align:center;font-size:.75rem;color:var(--ink-light);letter-spacing:.1em;text-transform:uppercase;margin-bottom:28px;}
+  .login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+  .login-field label{font-size:.7rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;}
+  .login-err{color:var(--red);font-size:.8rem;text-align:center;margin-bottom:10px;min-height:18px;}
+  .btn-login{width:100%;background:var(--gold);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Source Sans 3',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:background .18s;margin-top:4px;}
+  .btn-login:hover{background:var(--gold-light);}
+
+  /* USER BADGE in tab bar */
+  .user-badge{margin-left:auto;display:flex;align-items:center;gap:8px;padding:0 14px;}
+  .user-name{font-size:.75rem;color:rgba(255,255,255,.7);font-weight:600;}
+  .user-role-pill{font-size:.62rem;background:var(--gold);color:#fff;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+  .user-role-pill.emp{background:#4a6fa5;}
+  .btn-logout{padding:5px 11px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:6px;color:rgba(255,255,255,.55);font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:all .15s;}
+  .btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+  /* MANAGE EMPLOYEES */
+  .emp-card{background:var(--white);border:1px solid #d9d2c5;border-radius:12px;padding:24px 28px;box-shadow:0 4px 20px rgba(0,0,0,.07);margin-bottom:22px;}
+  .emp-card h2{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--ink-mid);border-bottom:2px solid var(--gold-pale);padding-bottom:9px;margin-bottom:20px;}
+  .emp-list{display:flex;flex-direction:column;gap:10px;}
+  .emp-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid #e8e3da;border-radius:8px;background:var(--bg);}
+  .emp-info .emp-uname{font-weight:700;font-size:.92rem;color:var(--ink);}
+  .emp-badge{font-size:.63rem;padding:2px 8px;border-radius:20px;font-weight:700;text-transform:uppercase;display:inline-block;margin-top:3px;}
+  .emp-badge.admin{background:var(--gold-pale);color:var(--gold);}
+  .emp-badge.employee{background:#e8f0fb;color:#4a6fa5;}
+  .btn-emp-del{padding:5px 11px;border:1px solid #ddd;border-radius:6px;background:transparent;color:#bbb;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;}
+  .btn-emp-del:hover{border-color:var(--red);color:var(--red);}
+
+  @media(max-width:600px){
+    .login-box{padding:26px 18px;}
+    .user-name{display:none;}
+    .user-badge{padding:0 8px;gap:6px;}
+  }
 </style>
 </head>
 <body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">ELDORADO</div>
+    <div class="login-sub">Money Receipt System</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="Enter username" autocomplete="off" />
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Enter password" />
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <button class="btn-login" onclick="doLogin()">Login →</button>
+  </div>
+</div>
 
 <div class="tab-bar">
   <div class="brand">ELDORADO</div>
   <button class="tab-btn active" onclick="switchTab('form')">📄 New Receipt</button>
   <button class="tab-btn" onclick="switchTab('records')">🗂 Records</button>
+  <button class="tab-btn" id="tab-emp-btn" onclick="switchTab('employees')" style="display:none">👥 Employees</button>
+  <div class="user-badge">
+    <span class="user-name" id="user-display"></span>
+    <span class="user-role-pill" id="role-pill"></span>
+    <button class="btn-logout" onclick="doLogout()">Logout</button>
+  </div>
 </div>
 
 <!-- ── FORM TAB ── -->
@@ -326,7 +444,7 @@
 <div class="tab-content" id="tab-records">
   <div class="records-header">
     <h2>📋 All Receipts</h2>
-    <button class="btn btn-danger" onclick="clearAllRecords()">🗑 Clear All</button>
+    <button class="btn btn-danger" id="clear-all-btn" onclick="clearAllRecords()" style="display:none">🗑 Clear All</button>
   </div>
 
   <!-- FILTER BAR -->
@@ -375,6 +493,45 @@
   </div>
 </div>
 
+<!-- ── EMPLOYEES TAB (ADMIN ONLY) ── -->
+<div class="tab-content" id="tab-employees">
+  <div class="tab-content" style="display:block;padding:0;">
+  <div class="emp-card">
+    <h2>➕ Add New Employee</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Username *</label>
+        <input type="text" id="new-emp-user" placeholder="e.g. rajesh123" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" id="new-emp-pass" placeholder="Set a password" />
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="new-emp-name" placeholder="Employee full name" />
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="new-emp-role">
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="addEmployee()">Add Employee ▶</button>
+    </div>
+  </div>
+
+  <div class="emp-card">
+    <h2>👥 All Users</h2>
+    <div class="emp-list" id="emp-list">
+      <div style="color:var(--ink-light);font-style:italic;font-size:.88rem;">Loading…</div>
+    </div>
+  </div>
+  </div>
+</div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, runTransaction, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -391,7 +548,122 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const RECEIPTS_COL = 'receipts';
-const COUNTER_DOC = 'meta/counter';
+const USERS_COL = 'users';
+
+// ── HARDCODED ADMIN ──
+const ADMIN = { username: 'mandalkuntal', password: 'Buku@2016', role: 'admin', name: 'Admin' };
+
+// ── SESSION ──
+let currentUser = null;
+function isAdmin() { return currentUser && currentUser.role === 'admin'; }
+
+// ── LOGIN / LOGOUT ──
+async function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  if (!u || !p) { err.textContent = 'Please enter username and password.'; return; }
+
+  if (u === ADMIN.username && p === ADMIN.password) {
+    currentUser = { username: ADMIN.username, role: 'admin', name: 'Admin' };
+    onLoggedIn(); return;
+  }
+  try {
+    err.textContent = 'Checking…';
+    const snap = await getDocs(collection(db, USERS_COL));
+    let found = null;
+    snap.forEach(d => { const data = d.data(); if (data.username === u && data.password === p) found = { ...data, _docId: d.id }; });
+    if (found) {
+      currentUser = { username: found.username, role: found.role, name: found.name || found.username };
+      onLoggedIn();
+    } else {
+      err.textContent = '✕ Invalid username or password.';
+    }
+  } catch(e) { err.textContent = 'Connection error. Try again.'; }
+}
+window.doLogin = doLogin;
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function onLoggedIn() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('user-display').textContent = currentUser.name || currentUser.username;
+  const pill = document.getElementById('role-pill');
+  pill.textContent = currentUser.role;
+  pill.className = 'user-role-pill' + (isAdmin() ? '' : ' emp');
+  if (isAdmin()) {
+    document.getElementById('tab-emp-btn').style.display = '';
+    document.getElementById('clear-all-btn').style.display = '';
+  }
+  initApp();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('tab-emp-btn').style.display = 'none';
+  document.getElementById('clear-all-btn').style.display = 'none';
+  switchTab('form');
+}
+window.doLogout = doLogout;
+
+// ── EMPLOYEE MANAGEMENT ──
+async function renderEmployees() {
+  const list = document.getElementById('emp-list');
+  list.innerHTML = '<div style="color:var(--ink-light);font-style:italic;font-size:.88rem;">Loading…</div>';
+  try {
+    const snap = await getDocs(collection(db, USERS_COL));
+    const emps = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    const allUsers = [{ username: ADMIN.username, role: 'admin', name: 'Admin', _docId: null }, ...emps];
+    list.innerHTML = allUsers.map(e => `
+      <div class="emp-row">
+        <div class="emp-info">
+          <div class="emp-uname">👤 ${e.name||e.username} <span style="color:var(--ink-light);font-weight:400;font-size:.82rem;">(${e.username})</span></div>
+          <span class="emp-badge ${e.role}">${e.role}</span>
+        </div>
+        ${e._docId ? `<button class="btn-emp-del" onclick="removeEmployee('${e._docId}')">✕ Remove</button>` : '<span style="font-size:.72rem;color:var(--ink-light);">Built-in</span>'}
+      </div>`).join('');
+  } catch(e) { list.innerHTML = `<div style="color:var(--red);">Error: ${e.message}</div>`; }
+}
+
+async function addEmployee() {
+  if (!isAdmin()) { toast('Admin only','err'); return; }
+  const uname = document.getElementById('new-emp-user').value.trim();
+  const pass  = document.getElementById('new-emp-pass').value;
+  const name  = document.getElementById('new-emp-name').value.trim();
+  const role  = document.getElementById('new-emp-role').value;
+  if (!uname || !pass) { toast('Username and password required','err'); return; }
+  if (uname === ADMIN.username) { toast('That username is reserved','err'); return; }
+  try {
+    toast('Adding…','info');
+    const snap = await getDocs(collection(db, USERS_COL));
+    let exists = false;
+    snap.forEach(d => { if (d.data().username === uname) exists = true; });
+    if (exists) { toast('Username already exists','err'); return; }
+    await addDoc(collection(db, USERS_COL), { username: uname, password: pass, name: name||uname, role, createdAt: new Date().toISOString() });
+    toast('Employee added ✓','ok');
+    ['new-emp-user','new-emp-pass','new-emp-name'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('new-emp-role').selectedIndex = 0;
+    renderEmployees();
+  } catch(e) { toast('Failed: '+e.message,'err'); }
+}
+window.addEmployee = addEmployee;
+
+async function removeEmployee(docId) {
+  if (!isAdmin()) { toast('Admin only','err'); return; }
+  if (!confirm('Remove this employee?')) return;
+  try {
+    await deleteDoc(doc(db, USERS_COL, docId));
+    toast('Removed ✓','ok');
+    renderEmployees();
+  } catch(e) { toast('Failed: '+e.message,'err'); }
+}
+window.removeEmployee = removeEmployee;
 
 // ── IN-MEMORY CACHE ──
 let _cache = [];
@@ -457,7 +729,10 @@ function switchTab(t) {
   document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
-  document.querySelectorAll('.tab-btn')[t==='form'?0:1].classList.add('active');
+  const btns = document.querySelectorAll('.tab-btn');
+  if(t==='form') btns[0].classList.add('active');
+  else if(t==='records') btns[1].classList.add('active');
+  else if(t==='employees') { document.getElementById('tab-emp-btn').classList.add('active'); renderEmployees(); }
   if(t==='records') renderTable();
 }
 window.switchTab = switchTab;
@@ -547,16 +822,13 @@ function initAutocomplete(inputId, dropdownId, getItems) {
 function getUniqueNames(){ return [...new Set(getCached().map(r=>r.name).filter(Boolean))].sort(); }
 function getUniquePurposes(){ return [...new Set(getCached().map(r=>r.purpose).filter(Boolean))].sort(); }
 
-
-
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', async ()=>{
+// ── INIT APP (called after login) ──
+async function initApp() {
   document.getElementById('rec-date').value=new Date().toISOString().split('T')[0];
   toast('Connecting to cloud…','info');
   try {
     const no = await nextNo();
     document.getElementById('rec-no').value = no;
-    // preload cache for autocomplete
     await loadRecs();
     toast('Connected ✓','ok');
   } catch(e) {
@@ -565,7 +837,9 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   }
   initAutocomplete('rec-name','ac-name', getUniqueNames);
   initAutocomplete('rec-purpose','ac-purpose', getUniquePurposes);
-});
+}
+
+// ── INIT ──
 
 // ── GENERATE ──
 async function generateReceipt(){
@@ -692,13 +966,14 @@ async function renderTable(){
     <td class="amt-col">${fmtA(r.amount)}</td>
     <td>
       <button class="tbl-action tbl-view" onclick="reprint('${r._docId}')">🖨 Reprint</button>
-      <button class="tbl-action tbl-del" onclick="delRec('${r._docId}')">✕</button>
+      ${isAdmin() ? `<button class="tbl-action tbl-del" onclick="delRec('${r._docId}')">✕</button>` : ''}
     </td>
   </tr>`).join('');
 }
 window.renderTable = renderTable;
 
 async function delRec(docId){
+  if(!isAdmin()){toast('Only admin can delete records','err');return;}
   if(!confirm('Delete this record?'))return;
   try {
     await deleteRec(docId);
@@ -707,6 +982,7 @@ async function delRec(docId){
   } catch(e){ toast('Delete failed: '+e.message,'err'); }
 }
 async function clearAllRecords(){
+  if(!isAdmin()){toast('Only admin can clear records','err');return;}
   if(!confirm('Delete ALL records? This cannot be undone.'))return;
   try {
     toast('Deleting all…','info');
