@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eldorado – Money Receipt</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#b8860b;--gold-light:#d4a017;--gold-pale:#f5e9c8;
+    --ink:#1a1a2e;--ink-mid:#3a3a5c;--ink-light:#6b6b8a;
+    --border:#c9a84c;--bg:#fafaf7;--white:#ffffff;
+    --red:#c0392b;--green:#1a7a4a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Sans 3',sans-serif;background:#e8e4dc;color:var(--ink);min-height:100vh;}
+
+  /* TABS */
+  .tab-bar{background:var(--ink);display:flex;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+  .brand{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.1rem;letter-spacing:.14em;padding:14px 22px;border-right:1px solid rgba(255,255,255,.1);flex-shrink:0;}
+  .tab-btn{padding:14px 20px;background:transparent;border:none;color:rgba(255,255,255,.5);font-family:'Source Sans 3',sans-serif;font-size:.83rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .18s;border-bottom:3px solid transparent;}
+  .tab-btn:hover{color:rgba(255,255,255,.85);}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .tab-content{display:none;padding:26px 18px;max-width:900px;margin:0 auto;}
+  .tab-content.active{display:block;}
+
+  /* FORM */
+  .form-card{background:var(--white);border:1px solid #d9d2c5;border-radius:12px;padding:28px 32px;box-shadow:0 4px 20px rgba(0,0,0,.07);margin-bottom:22px;}
+  .form-card h2{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--ink-mid);border-bottom:2px solid var(--gold-pale);padding-bottom:9px;margin-bottom:20px;letter-spacing:.04em;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px 20px;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-group.full{grid-column:1/-1;}
+  label{font-size:.72rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;}
+  input,textarea,select{border:1.5px solid #d9d2c5;border-radius:7px;padding:9px 12px;font-family:'Source Sans 3',sans-serif;font-size:.93rem;color:var(--ink);background:var(--bg);outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
+  input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,134,11,.12);}
+  input[readonly]{background:var(--gold-pale);border-color:var(--border);font-weight:700;color:var(--gold);cursor:default;}
+  textarea{resize:vertical;min-height:66px;}
+  .words-box{background:var(--gold-pale);border:1.5px dashed var(--border);border-radius:7px;padding:9px 12px;font-size:.88rem;color:var(--ink-mid);font-style:italic;min-height:40px;}
+
+  /* AUTOCOMPLETE */
+  .ac-wrap{position:relative;}
+  .ac-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--white);border:1.5px solid var(--gold);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:200;max-height:200px;overflow-y:auto;display:none;}
+  .ac-dropdown.open{display:block;}
+  .ac-item{padding:9px 13px;font-size:.88rem;color:var(--ink);cursor:pointer;border-bottom:1px solid #f0ede6;transition:background .12s;}
+  .ac-item:last-child{border-bottom:none;}
+  .ac-item:hover,.ac-item.active{background:var(--gold-pale);color:var(--ink);}
+  .ac-item mark{background:none;color:var(--gold);font-weight:700;}
+
+  /* SIG AREA */
+  .sig-section{margin-top:18px;}
+  .sig-section-title{font-size:.72rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;margin-bottom:11px;}
+  .sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sig-box-wrap{display:flex;flex-direction:column;gap:5px;}
+  .sig-label{font-size:.72rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;}
+  .sig-blank-box{border:1.5px solid #d9d2c5;border-radius:8px;background:#fefefe;height:96px;}
+
+  /* BUTTONS */
+  .btn-row{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;align-items:center;}
+  .btn{padding:10px 24px;border-radius:8px;font-family:'Source Sans 3',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.04em;cursor:pointer;border:none;transition:all .18s;}
+  .btn-primary{background:var(--gold);color:#fff;}
+  .btn-primary:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 14px rgba(184,134,11,.3);}
+  .btn-secondary{background:transparent;color:var(--ink-mid);border:1.5px solid #c5bfb0;}
+  .btn-secondary:hover{background:#f0ede6;}
+  .btn-print{background:var(--ink);color:#fff;}
+  .btn-print:hover{background:var(--ink-mid);}
+  .btn-danger{background:transparent;color:var(--red);border:1.5px solid var(--red);font-size:.8rem;padding:7px 13px;}
+  .btn-danger:hover{background:var(--red);color:#fff;}
+
+  /* RECORDS */
+  .records-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .records-header h2{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--ink-mid);}
+  #search-input{padding:8px 13px;border-radius:7px;border:1.5px solid #d9d2c5;font-size:.86rem;width:210px;background:var(--white);font-family:'Source Sans 3',sans-serif;outline:none;}
+  #search-input:focus{border-color:var(--gold);}
+  .stats-row{display:flex;gap:14px;margin-bottom:16px;}
+  .stat-card{background:var(--white);border:1px solid #d9d2c5;border-radius:10px;padding:13px 18px;flex:1;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .stat-val{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold);font-weight:700;}
+  .stat-lbl{font-size:.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+  .table-wrap{background:var(--white);border:1px solid #d9d2c5;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  table{width:100%;border-collapse:collapse;font-size:.84rem;}
+  thead{background:var(--ink);color:#fff;}
+  thead th{padding:10px 12px;text-align:left;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;font-weight:700;}
+  tbody tr:nth-child(even){background:#f7f4ee;}
+  tbody tr:hover{background:var(--gold-pale);}
+  tbody td{padding:9px 12px;border-bottom:1px solid #ede8de;vertical-align:middle;}
+  .no-col{font-family:'Playfair Display',serif;font-weight:700;color:var(--gold);}
+  .amt-col{font-weight:700;color:var(--green);}
+  .empty-state{text-align:center;padding:38px;color:var(--ink-light);font-style:italic;}
+  .tbl-action{font-size:.72rem;padding:4px 9px;border-radius:5px;border:1px solid;cursor:pointer;font-family:'Source Sans 3',sans-serif;font-weight:700;transition:all .15s;background:transparent;}
+  .tbl-view{border-color:var(--gold);color:var(--gold);}
+  .tbl-view:hover{background:var(--gold);color:#fff;}
+  .tbl-del{border-color:#ddd;color:#bbb;margin-left:4px;}
+  .tbl-del:hover{border-color:var(--red);color:var(--red);}
+
+
+  /* FILTERS */
+  .filter-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;background:var(--white);border:1px solid #d9d2c5;border-radius:10px;padding:16px 18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .filter-group{display:flex;flex-direction:column;gap:4px;min-width:140px;}
+  .filter-label{font-size:.68rem;font-weight:700;color:var(--ink-light);letter-spacing:.07em;text-transform:uppercase;}
+  .filter-bar input[type="text"],.filter-bar input[type="date"],.filter-bar select{padding:7px 10px;border-radius:7px;border:1.5px solid #d9d2c5;font-family:'Source Sans 3',sans-serif;font-size:.84rem;color:var(--ink);background:var(--bg);outline:none;transition:border-color .2s;}
+  .filter-bar input:focus,.filter-bar select:focus{border-color:var(--gold);}
+  .btn-reset-filter{padding:7px 14px;border-radius:7px;border:1.5px solid #d9d2c5;background:transparent;font-family:'Source Sans 3',sans-serif;font-size:.78rem;font-weight:700;color:var(--ink-light);cursor:pointer;align-self:flex-end;transition:all .15s;white-space:nowrap;}
+  .btn-reset-filter:hover{border-color:var(--red);color:var(--red);}
+  .filtered-stat .stat-val{color:var(--green);}
+  #search-input{width:160px;}
+
+  /* PREVIEW */
+  #preview-section{display:none;margin-top:20px;}
+  #preview-section.visible{display:block;}
+  .preview-label{font-family:'Playfair Display',serif;font-size:.98rem;color:var(--ink-mid);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+  .preview-label::after{content:'';flex:1;height:1px;background:#d9d2c5;}
+
+  /* PRINT */
+  @media print {
+    body{background:white!important;padding:0!important;}
+    .tab-bar,.form-card,.sig-section,.btn-row,.preview-label,.records-header,.stats-row,.table-wrap,.no-print{display:none!important;}
+    #print-area{display:block!important;}
+    .print-page{width:210mm;height:297mm;page-break-after:always;display:flex!important;flex-direction:column;margin:0;padding:0;box-shadow:none!important;}
+    .receipt-half{height:148.5mm!important;padding:9mm 13mm!important;box-shadow:none!important;border-radius:0!important;}
+    .receipt-half.cashier{border-bottom:2px dashed #aaa!important;}
+    .scissors-line{border-top:1px dashed #aaa!important;border-bottom:1px dashed #aaa!important;}
+  }
+  #print-area{display:none;}
+  .print-page{background:white;width:210mm;margin:0 auto;display:flex;flex-direction:column;box-shadow:0 6px 36px rgba(0,0,0,.14);border-radius:4px;overflow:hidden;}
+
+  /* RECEIPT HALVES */
+  .receipt-half{width:100%;height:148.5mm;padding:9mm 13mm;background:white;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+  .receipt-half.cashier{border-bottom:2px dashed #b0a88c;}
+  .receipt-half::after{content:attr(data-copy);position:absolute;bottom:10mm;right:8mm;font-family:'Playfair Display',serif;font-size:48px;color:rgba(184,134,11,.065);font-weight:700;letter-spacing:.1em;text-transform:uppercase;transform:rotate(-28deg);pointer-events:none;white-space:nowrap;}
+  .rec-header{text-align:center;border-bottom:2.5px double var(--gold);padding-bottom:6px;margin-bottom:6px;}
+  .rec-logo{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;line-height:1;}
+  .rec-address{font-size:7.5px;color:var(--ink-light);margin-top:3px;letter-spacing:.03em;line-height:1.5;}
+  .copy-badge{display:inline-block;background:var(--ink);color:#fff;font-size:6.5px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-top:3px;}
+  .copy-badge.gold{background:var(--gold);}
+  .rec-meta{display:flex;justify-content:space-between;align-items:center;margin:5px 0 4px;font-size:9px;}
+  .meta-item{display:flex;flex-direction:column;gap:1px;}
+  .meta-label{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-light);font-weight:700;}
+  .meta-val{font-size:11px;font-weight:700;color:var(--ink);}
+  .rec-title{text-align:center;}
+  .rec-title h2{font-family:'Playfair Display',serif;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink);}
+  .rec-title h2::before,.rec-title h2::after{content:'◆';color:var(--gold);font-size:7px;margin:0 6px;vertical-align:middle;}
+  .rec-body{flex:1;display:flex;flex-direction:column;gap:3px;}
+  .rec-field{display:flex;align-items:baseline;gap:5px;border-bottom:.8px solid #e0dbd0;padding-bottom:3px;}
+  .rfl{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);min-width:72px;flex-shrink:0;}
+  .rfv{font-size:10px;color:var(--ink);font-weight:500;flex:1;}
+  .amount-box{background:var(--gold-pale);border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;display:flex;justify-content:space-between;align-items:center;margin:3px 0;}
+  .alabel{font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);font-weight:700;}
+  .afig{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink);}
+  .awords{font-size:8px;font-style:italic;color:var(--ink-mid);border-bottom:.8px dotted #c5bfb0;padding-bottom:3px;}
+  .awords span{font-weight:600;}
+  .sign-row{display:flex;justify-content:space-between;margin-top:auto;padding-top:5px;gap:18px;}
+  .sign-box{display:flex;flex-direction:column;align-items:center;flex:1;}
+  .sign-area{width:100%;height:36px;border-bottom:1px solid var(--ink);margin-bottom:3px;position:relative;overflow:hidden;}
+  .sign-area img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);max-height:34px;max-width:100%;object-fit:contain;}
+  .sign-cap{font-size:7px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-light);font-weight:700;}
+  .rec-footer{text-align:center;margin-top:4px;font-size:6.5px;color:var(--ink-light);border-top:.8px dashed #c5bfb0;padding-top:3px;letter-spacing:.03em;}
+  .scissors-line{text-align:center;font-size:8px;color:#c5bfb0;letter-spacing:.2em;padding:2px 0;border-top:1px dashed #c5bfb0;border-bottom:1px dashed #c5bfb0;user-select:none;}
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <div class="brand">ELDORADO</div>
+  <button class="tab-btn active" onclick="switchTab('form')">📄 New Receipt</button>
+  <button class="tab-btn" onclick="switchTab('records')">🗂 Records</button>
+</div>
+
+<!-- ── FORM TAB ── -->
+<div class="tab-content active" id="tab-form">
+  <div class="form-card">
+    <h2>New Money Receipt</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Receipt No. (Auto-Generated)</label>
+        <input type="text" id="rec-no" readonly />
+      </div>
+      <div class="form-group">
+        <label>Date *</label>
+        <input type="date" id="rec-date" />
+      </div>
+      <div class="form-group full">
+        <label>Recipient Name *</label>
+        <div class="ac-wrap">
+          <input type="text" id="rec-name" placeholder="Enter recipient's full name" autocomplete="off" />
+          <div class="ac-dropdown" id="ac-name"></div>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>Purpose of Payment *</label>
+        <div class="ac-wrap">
+          <textarea id="rec-purpose" placeholder="e.g. Monthly rent for May 2025 – Flat No. 3A" autocomplete="off" rows="2"></textarea>
+          <div class="ac-dropdown" id="ac-purpose"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Amount (₹) *</label>
+        <input type="number" id="rec-amount" placeholder="0.00" min="0" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select id="rec-mode">
+          <option>Cash</option><option>Cheque</option><option>UPI</option>
+          <option>Bank Transfer</option><option>Demand Draft</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Amount in Words (Auto)</label>
+        <div class="words-box" id="words-display">—</div>
+      </div>
+    </div>
+
+    <!-- SIGNATURE AREAS -->
+    <div class="sig-section">
+      <div class="sig-section-title">Signatures</div>
+      <div class="sig-grid">
+        <div class="sig-box-wrap">
+          <div class="sig-label">Cashier / Authorised By</div>
+          <div class="sig-blank-box"></div>
+        </div>
+        <div class="sig-box-wrap">
+          <div class="sig-label">Recipient / Received By</div>
+          <div class="sig-blank-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+      <button class="btn btn-primary" onclick="generateReceipt()">Generate Receipt ▶</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="preview-section">
+    <div class="preview-label no-print">Receipt Preview</div>
+    <div class="btn-row no-print" style="margin-top:0;margin-bottom:14px;">
+      <button class="btn btn-secondary" onclick="hidePreview()">← Edit</button>
+      <button class="btn btn-print" onclick="window.print()">🖨 Print Receipt</button>
+    </div>
+    <div id="print-area">
+      <div class="print-page" id="print-page">
+
+        <!-- CASHIER COPY -->
+        <div class="receipt-half cashier" data-copy="CASHIER">
+          <div class="rec-header">
+            <div class="rec-logo">ELDORADO</div>
+            <div class="rec-address">Ramnagar Road, Bongaon, North 24 Parganas, Pin – 743235 &nbsp;|&nbsp; Mob: 9332677500</div>
+            <span class="copy-badge gold">Cashier Copy</span>
+          </div>
+          <div class="rec-meta">
+            <div class="meta-item"><span class="meta-label">Receipt No.</span><span class="meta-val" id="pc-no">—</span></div>
+            <div class="rec-title"><h2>Money Receipt</h2></div>
+            <div class="meta-item" style="text-align:right"><span class="meta-label">Date</span><span class="meta-val" id="pc-date">—</span></div>
+          </div>
+          <div class="rec-body">
+            <div class="rec-field"><span class="rfl">Recipient Name</span><span class="rfv" id="pc-name">—</span></div>
+            <div class="rec-field"><span class="rfl">Purpose</span><span class="rfv" id="pc-purpose">—</span></div>
+            <div class="rec-field"><span class="rfl">Payment Mode</span><span class="rfv" id="pc-mode">—</span></div>
+            <div class="amount-box"><span class="alabel">Amount Received (₹)</span><span class="afig" id="pc-amt">—</span></div>
+            <div class="awords">Rupees: <span id="pc-words">—</span></div>
+            <div class="sign-row">
+              <div class="sign-box">
+                <div class="sign-area"><img id="pc-csig" src="" alt="" style="display:none"/></div>
+                <div class="sign-cap">Cashier's Signature</div>
+              </div>
+              <div class="sign-box">
+                <div class="sign-area"><img id="pc-rsig" src="" alt="" style="display:none"/></div>
+                <div class="sign-cap">Recipient's Signature</div>
+              </div>
+            </div>
+          </div>
+          <div class="rec-footer">Computer-generated receipt · Eldorado, Ramnagar Road, Bongaon, North 24 Parganas – 743235</div>
+        </div>
+
+        <div class="scissors-line">✂ &nbsp; CUT HERE &nbsp; ✂</div>
+
+        <!-- RECIPIENT COPY -->
+        <div class="receipt-half" data-copy="RECIPIENT">
+          <div class="rec-header">
+            <div class="rec-logo">ELDORADO</div>
+            <div class="rec-address">Ramnagar Road, Bongaon, North 24 Parganas, Pin – 743235 &nbsp;|&nbsp; Mob: 9332677500</div>
+            <span class="copy-badge">Recipient Copy</span>
+          </div>
+          <div class="rec-meta">
+            <div class="meta-item"><span class="meta-label">Receipt No.</span><span class="meta-val" id="pr-no">—</span></div>
+            <div class="rec-title"><h2>Money Receipt</h2></div>
+            <div class="meta-item" style="text-align:right"><span class="meta-label">Date</span><span class="meta-val" id="pr-date">—</span></div>
+          </div>
+          <div class="rec-body">
+            <div class="rec-field"><span class="rfl">Recipient Name</span><span class="rfv" id="pr-name">—</span></div>
+            <div class="rec-field"><span class="rfl">Purpose</span><span class="rfv" id="pr-purpose">—</span></div>
+            <div class="rec-field"><span class="rfl">Payment Mode</span><span class="rfv" id="pr-mode">—</span></div>
+            <div class="amount-box"><span class="alabel">Amount Received (₹)</span><span class="afig" id="pr-amt">—</span></div>
+            <div class="awords">Rupees: <span id="pr-words">—</span></div>
+            <div class="sign-row">
+              <div class="sign-box">
+                <div class="sign-area"><img id="pr-csig" src="" alt="" style="display:none"/></div>
+                <div class="sign-cap">Cashier's Signature</div>
+              </div>
+              <div class="sign-box">
+                <div class="sign-area"><img id="pr-rsig" src="" alt="" style="display:none"/></div>
+                <div class="sign-cap">Recipient's Signature</div>
+              </div>
+            </div>
+          </div>
+          <div class="rec-footer">Computer-generated receipt · Eldorado, Ramnagar Road, Bongaon, North 24 Parganas – 743235</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RECORDS TAB ── -->
+<div class="tab-content" id="tab-records">
+  <div class="records-header">
+    <h2>📋 All Receipts</h2>
+    <button class="btn btn-danger" onclick="clearAllRecords()">🗑 Clear All</button>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label class="filter-label">🔍 Search</label>
+      <input type="text" id="search-input" placeholder="Name or receipt no…" oninput="renderTable()" />
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">👤 Recipient</label>
+      <select id="filter-name" onchange="renderTable()"><option value="">All Recipients</option></select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">📋 Purpose</label>
+      <select id="filter-purpose" onchange="renderTable()"><option value="">All Purposes</option></select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">📅 From Date</label>
+      <input type="date" id="filter-from" onchange="renderTable()" />
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">📅 To Date</label>
+      <input type="date" id="filter-to" onchange="renderTable()" />
+    </div>
+    <button class="btn-reset-filter" onclick="resetFilters()">✕ Reset</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-count">0</div><div class="stat-lbl">Total Receipts</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-total">₹0</div><div class="stat-lbl">Total Spend</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-today">0</div><div class="stat-lbl">Today's Receipts</div></div>
+    <div class="stat-card filtered-stat"><div class="stat-val" id="stat-filtered-total">₹0</div><div class="stat-lbl">Filtered Spend</div></div>
+    <div class="stat-card filtered-stat"><div class="stat-val" id="stat-filtered-count">0</div><div class="stat-lbl">Filtered Count</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Receipt No.</th><th>Date</th><th>Recipient</th><th>Purpose</th><th>Mode</th><th>Amount</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="records-tbody">
+        <tr><td colspan="7" class="empty-state">No records yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, runTransaction, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ── FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey: "AIzaSyBSVpFZOn-UjyXAHYx0qXr8z3nulD4DnA4",
+  authDomain: "recipet-78c60.firebaseapp.com",
+  projectId: "recipet-78c60",
+  storageBucket: "recipet-78c60.firebasestorage.app",
+  messagingSenderId: "241077411814",
+  appId: "1:241077411814:web:8971fb657ba69cfadb8027"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const RECEIPTS_COL = 'receipts';
+const COUNTER_DOC = 'meta/counter';
+
+// ── IN-MEMORY CACHE ──
+let _cache = [];
+let _loaded = false;
+
+async function loadRecs() {
+  const q = query(collection(db, RECEIPTS_COL), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  _cache = snap.docs.map(d => ({...d.data(), _docId: d.id}));
+  _loaded = true;
+  return _cache;
+}
+
+function getCached() { return _cache; }
+
+async function saveRec(rec) {
+  const docRef = await addDoc(collection(db, RECEIPTS_COL), rec);
+  _cache.unshift({...rec, _docId: docRef.id});
+}
+
+async function deleteRec(docId) {
+  await deleteDoc(doc(db, RECEIPTS_COL, docId));
+  _cache = _cache.filter(r => r._docId !== docId);
+}
+
+async function clearAll() {
+  const snap = await getDocs(collection(db, RECEIPTS_COL));
+  const dels = snap.docs.map(d => deleteDoc(doc(db, RECEIPTS_COL, d.id)));
+  await Promise.all(dels);
+  _cache = [];
+}
+
+// ── RECEIPT NUMBER (atomic counter in Firestore) ──
+async function nextNo() {
+  const ref = doc(db, 'meta', 'counter');
+  let n = 1;
+  try {
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(ref);
+      n = snap.exists() ? (snap.data().n || 0) + 1 : 1;
+      tx.set(ref, { n });
+    });
+  } catch(e) {
+    n = Date.now(); // fallback
+  }
+  const y = new Date().getFullYear().toString().slice(2);
+  return `ELD-${y}-${String(n).padStart(4,'0')}`;
+}
+
+// ── STATUS TOAST ──
+function toast(msg, type='info') {
+  let t = document.getElementById('fb-toast');
+  if(!t){ t=document.createElement('div'); t.id='fb-toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = 'fb-toast fb-toast-'+type;
+  t.style.cssText = `position:fixed;bottom:22px;right:22px;padding:11px 20px;border-radius:8px;font-size:.85rem;font-weight:700;z-index:9999;box-shadow:0 4px 18px rgba(0,0,0,.15);transition:opacity .3s;color:#fff;background:${type==='ok'?'#1a7a4a':type==='err'?'#c0392b':'#3a3a5c'}`;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.style.opacity='0', 2200);
+}
+
+// ── TABS ──
+function switchTab(t) {
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.querySelectorAll('.tab-btn')[t==='form'?0:1].classList.add('active');
+  if(t==='records') renderTable();
+}
+window.switchTab = switchTab;
+
+// ── AMOUNT TO WORDS (Indian) ──
+const O=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+const T=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+function n2w(n){
+  if(n===0)return'Zero';if(n<20)return O[n];if(n<100)return T[Math.floor(n/10)]+(n%10?' '+O[n%10]:'');
+  if(n<1000)return O[Math.floor(n/100)]+' Hundred'+(n%100?' '+n2w(n%100):'');
+  if(n<100000)return n2w(Math.floor(n/1000))+' Thousand'+(n%1000?' '+n2w(n%1000):'');
+  if(n<10000000)return n2w(Math.floor(n/100000))+' Lakh'+(n%100000?' '+n2w(n%100000):'');
+  return n2w(Math.floor(n/10000000))+' Crore'+(n%10000000?' '+n2w(n%10000000):'');
+}
+function amtW(v){
+  v=parseFloat(v); if(isNaN(v)||v<0)return'—';
+  const r=Math.floor(v),p=Math.round((v-r)*100);
+  return n2w(r)+' Rupees'+(p>0?' and '+n2w(p)+' Paise':'')+' Only';
+}
+document.getElementById('rec-amount').addEventListener('input',function(){
+  document.getElementById('words-display').textContent=this.value?amtW(this.value):'—';
+});
+
+// ── HELPERS ──
+function fmtD(d){if(!d)return'—';const[y,m,day]=d.split('-');return`${day}/${m}/${y}`;}
+function fmtA(v){v=parseFloat(v);return isNaN(v)?'0.00':'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+// ── AUTOCOMPLETE ──
+function highlight(text, query) {
+  if(!query) return text;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if(idx === -1) return text;
+  return text.slice(0,idx)+'<mark>'+text.slice(idx,idx+query.length)+'</mark>'+text.slice(idx+query.length);
+}
+function initAutocomplete(inputId, dropdownId, getItems) {
+  const input = document.getElementById(inputId);
+  const drop = document.getElementById(dropdownId);
+  let activeIdx = -1;
+
+  function showDrop(items, query) {
+    if(!items.length){drop.classList.remove('open');return;}
+    activeIdx = -1;
+    drop.innerHTML = items.map((item,i)=>
+      `<div class="ac-item" data-val="${item.replace(/"/g,'&quot;')}" data-idx="${i}">${highlight(item, query)}</div>`
+    ).join('');
+    drop.classList.add('open');
+    drop.querySelectorAll('.ac-item').forEach(el=>{
+      el.addEventListener('mousedown', e=>{
+        e.preventDefault();
+        input.value = el.getAttribute('data-val');
+        input.dispatchEvent(new Event('input'));
+        drop.classList.remove('open');
+      });
+    });
+  }
+
+  input.addEventListener('input', function(){
+    const q = this.value.trim();
+    const all = getItems();
+    const filtered = q ? all.filter(s=>s.toLowerCase().includes(q.toLowerCase())) : all.slice(0,8);
+    showDrop(filtered, q);
+  });
+
+  input.addEventListener('focus', function(){
+    const q = this.value.trim();
+    const all = getItems();
+    const filtered = q ? all.filter(s=>s.toLowerCase().includes(q.toLowerCase())) : all.slice(0,8);
+    showDrop(filtered, q);
+  });
+
+  input.addEventListener('keydown', function(e){
+    const items = drop.querySelectorAll('.ac-item');
+    if(!items.length) return;
+    if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,items.length-1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,-1);}
+    else if(e.key==='Enter'&&activeIdx>=0){e.preventDefault();input.value=items[activeIdx].getAttribute('data-val');input.dispatchEvent(new Event('input'));drop.classList.remove('open');return;}
+    else if(e.key==='Escape'){drop.classList.remove('open');return;}
+    items.forEach((el,i)=>el.classList.toggle('active',i===activeIdx));
+    if(activeIdx>=0) items[activeIdx].scrollIntoView({block:'nearest'});
+  });
+
+  document.addEventListener('click', e=>{
+    if(!input.contains(e.target)&&!drop.contains(e.target)) drop.classList.remove('open');
+  });
+}
+
+function getUniqueNames(){ return [...new Set(getCached().map(r=>r.name).filter(Boolean))].sort(); }
+function getUniquePurposes(){ return [...new Set(getCached().map(r=>r.purpose).filter(Boolean))].sort(); }
+
+
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', async ()=>{
+  document.getElementById('rec-date').value=new Date().toISOString().split('T')[0];
+  toast('Connecting to cloud…','info');
+  try {
+    const no = await nextNo();
+    document.getElementById('rec-no').value = no;
+    // preload cache for autocomplete
+    await loadRecs();
+    toast('Connected ✓','ok');
+  } catch(e) {
+    toast('Firebase error: '+e.message,'err');
+    document.getElementById('rec-no').value = 'ELD-LOCAL-001';
+  }
+  initAutocomplete('rec-name','ac-name', getUniqueNames);
+  initAutocomplete('rec-purpose','ac-purpose', getUniquePurposes);
+});
+
+// ── GENERATE ──
+async function generateReceipt(){
+  const recNo=document.getElementById('rec-no').value;
+  const date=document.getElementById('rec-date').value;
+  const name=document.getElementById('rec-name').value.trim();
+  const purpose=document.getElementById('rec-purpose').value.trim();
+  const amount=document.getElementById('rec-amount').value;
+  const mode=document.getElementById('rec-mode').value;
+  if(!date||!name||!purpose||!amount){alert('Please fill all required fields.');return;}
+  const words=amtW(amount),amtFmt=fmtA(amount),dateFmt=fmtD(date);
+
+  // fill both copies
+  const fill=(pre)=>{
+    document.getElementById(pre+'no').textContent=recNo;
+    document.getElementById(pre+'date').textContent=dateFmt;
+    document.getElementById(pre+'name').textContent=name;
+    document.getElementById(pre+'purpose').textContent=purpose;
+    document.getElementById(pre+'mode').textContent=mode;
+    document.getElementById(pre+'amt').textContent=amtFmt;
+    document.getElementById(pre+'words').textContent=words;
+    const ci=document.getElementById(pre+'csig'),ri=document.getElementById(pre+'rsig');
+    ci.style.display='none';ri.style.display='none';
+  };
+  fill('pc-');fill('pr-');
+
+  // save to Firestore
+  try {
+    toast('Saving to cloud…','info');
+    await saveRec({recNo,date,name,purpose,mode,amount:parseFloat(amount),words,createdAt:new Date().toISOString()});
+    toast('Receipt saved ✓','ok');
+    // refresh receipt number for next entry
+    const nxt = await nextNo();
+    document.getElementById('rec-no').value = nxt;
+  } catch(e) {
+    toast('Save failed: '+e.message,'err');
+  }
+
+  document.getElementById('preview-section').classList.add('visible');
+  document.getElementById('print-area').style.display='block';
+  setTimeout(()=>document.getElementById('preview-section').scrollIntoView({behavior:'smooth',block:'start'}),80);
+}
+window.generateReceipt = generateReceipt;
+
+function hidePreview(){
+  document.getElementById('preview-section').classList.remove('visible');
+  document.getElementById('print-area').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+window.hidePreview = hidePreview;
+
+function clearForm(){
+  ['rec-date','rec-name','rec-purpose','rec-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rec-mode').selectedIndex=0;
+  document.getElementById('words-display').textContent='—';
+  hidePreview();
+  nextNo().then(n=>document.getElementById('rec-no').value=n);
+}
+window.clearForm = clearForm;
+
+// ── POPULATE FILTER DROPDOWNS ──
+function populateFilters(){
+  const recs=getCached();
+  const names=[...new Set(recs.map(r=>r.name).filter(Boolean))].sort();
+  const purposes=[...new Set(recs.map(r=>r.purpose).filter(Boolean))].sort();
+  const nSel=document.getElementById('filter-name');
+  const pSel=document.getElementById('filter-purpose');
+  const curN=nSel.value, curP=pSel.value;
+  nSel.innerHTML='<option value="">All Recipients</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
+  pSel.innerHTML='<option value="">All Purposes</option>'+purposes.map(p=>`<option value="${p}">${p}</option>`).join('');
+  nSel.value=curN; pSel.value=curP;
+}
+
+function resetFilters(){
+  document.getElementById('search-input').value='';
+  document.getElementById('filter-name').value='';
+  document.getElementById('filter-purpose').value='';
+  document.getElementById('filter-from').value='';
+  document.getElementById('filter-to').value='';
+  renderTable();
+}
+window.resetFilters = resetFilters;
+
+// ── RECORDS TABLE ──
+async function renderTable(){
+  const tbody=document.getElementById('records-tbody');
+  tbody.innerHTML='<tr><td colspan="7" class="empty-state" style="color:#b8860b">⏳ Loading from cloud…</td></tr>';
+  try {
+    await loadRecs();
+  } catch(e) {
+    tbody.innerHTML=`<tr><td colspan="7" class="empty-state" style="color:#c0392b">⚠ Could not load records: ${e.message}</td></tr>`;
+    return;
+  }
+  populateFilters();
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  const fName=document.getElementById('filter-name').value;
+  const fPurpose=document.getElementById('filter-purpose').value;
+  const fFrom=document.getElementById('filter-from').value;
+  const fTo=document.getElementById('filter-to').value;
+  const recs=getCached();
+  const today=new Date().toISOString().split('T')[0];
+  const total=recs.reduce((s,r)=>s+r.amount,0);
+  document.getElementById('stat-count').textContent=recs.length;
+  document.getElementById('stat-total').textContent='₹'+total.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('stat-today').textContent=recs.filter(r=>r.date===today).length;
+  const fil=recs.filter(r=>{
+    if(q && !r.name.toLowerCase().includes(q) && !r.recNo.toLowerCase().includes(q)) return false;
+    if(fName && r.name!==fName) return false;
+    if(fPurpose && r.purpose!==fPurpose) return false;
+    if(fFrom && r.date<fFrom) return false;
+    if(fTo && r.date>fTo) return false;
+    return true;
+  });
+  const filteredTotal=fil.reduce((s,r)=>s+r.amount,0);
+  document.getElementById('stat-filtered-total').textContent='₹'+filteredTotal.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('stat-filtered-count').textContent=fil.length;
+  if(!fil.length){tbody.innerHTML='<tr><td colspan="7" class="empty-state">No records match the filter.</td></tr>';return;}
+  tbody.innerHTML=fil.map(r=>`<tr>
+    <td class="no-col">${r.recNo}</td>
+    <td>${fmtD(r.date)}</td>
+    <td>${r.name}</td>
+    <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.purpose}">${r.purpose}</td>
+    <td>${r.mode}</td>
+    <td class="amt-col">${fmtA(r.amount)}</td>
+    <td>
+      <button class="tbl-action tbl-view" onclick="reprint('${r._docId}')">🖨 Reprint</button>
+      <button class="tbl-action tbl-del" onclick="delRec('${r._docId}')">✕</button>
+    </td>
+  </tr>`).join('');
+}
+window.renderTable = renderTable;
+
+async function delRec(docId){
+  if(!confirm('Delete this record?'))return;
+  try {
+    await deleteRec(docId);
+    toast('Record deleted','ok');
+    renderTable();
+  } catch(e){ toast('Delete failed: '+e.message,'err'); }
+}
+async function clearAllRecords(){
+  if(!confirm('Delete ALL records? This cannot be undone.'))return;
+  try {
+    toast('Deleting all…','info');
+    await clearAll();
+    toast('All records deleted','ok');
+    renderTable();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+}
+window.delRec = delRec;
+window.clearAllRecords = clearAllRecords;
+function reprint(docId){
+  const r=getCached().find(x=>x._docId===docId);if(!r)return;
+  const fill=(pre)=>{
+    document.getElementById(pre+'no').textContent=r.recNo;
+    document.getElementById(pre+'date').textContent=fmtD(r.date);
+    document.getElementById(pre+'name').textContent=r.name;
+    document.getElementById(pre+'purpose').textContent=r.purpose;
+    document.getElementById(pre+'mode').textContent=r.mode;
+    document.getElementById(pre+'amt').textContent=fmtA(r.amount);
+    document.getElementById(pre+'words').textContent=r.words;
+    const ci=document.getElementById(pre+'csig'),ri=document.getElementById(pre+'rsig');
+    ci.style.display='none';ri.style.display='none';
+  };
+  fill('pc-');fill('pr-');
+  switchTab('form');
+  document.getElementById('preview-section').classList.add('visible');
+  document.getElementById('print-area').style.display='block';
+  setTimeout(()=>window.print(),350);
+}
+window.reprint = reprint;
+
+// ── INIT ──
+
+</script>
+</body>
+</html>
