@@ -961,6 +961,12 @@ function toast(msg, type='info') {
 
 // ── TABS ──
 function switchTab(t) {
+  // If leaving the form tab, hide preview and clear form so it's always fresh
+  const currentlyOnForm = document.getElementById('tab-form').classList.contains('active');
+  if(currentlyOnForm && t !== 'form') {
+    hidePreview();
+    clearForm();
+  }
   document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
@@ -1112,9 +1118,15 @@ async function generateReceipt(){
     document.getElementById('pr-no').textContent = confirmedNo;
     await saveRec({recNo:confirmedNo,date,name,purpose,mode,amount:parseFloat(amount),words,createdAt:new Date().toISOString()});
     toast('Receipt saved ✓','ok');
+    // Clear form fields so New Receipt tab is fresh — preview stays visible for printing
+    ['rec-date','rec-name','rec-purpose','rec-amount'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('rec-mode').selectedIndex=0;
+    document.getElementById('words-display').textContent='—';
     // show NEXT pending number (peek only – no increment)
     const nxt = await peekNo();
     document.getElementById('rec-no').value = nxt;
+    // Restore today's date for next entry
+    document.getElementById('rec-date').value=new Date().toISOString().split('T')[0];
   } catch(e) {
     toast('Save failed: '+e.message,'err');
   }
